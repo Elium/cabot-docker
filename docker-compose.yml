@@ -1,34 +1,56 @@
+nginx:
+  external_links:
+  - elium-prod/api-db:api-db
+  labels:
+    io.rancher.sidekicks: app
+    io.rancher.container.pull_image: always
+    io.rancher.scheduler.affinity:host_label: server=true
+  command:
+  - nginx
+  - -c
+  - /cabot/nginx.conf
+  - -g
+  - daemon off;
+  image: nginx:alpine
+  volumes_from:
+  - app
 app:
-  build: ./Cabot
-  links:
-    - db
-    - celerybroker
-    - smtp
+  external_links:
+  - elium-prod/api-db:api-db
+  labels:
+    io.rancher.container.pull_image: always
+    io.rancher.scheduler.affinity:host_label: server=true
+  entrypoint:
+  - /cabot/wait-for-it.sh
+  - -h
+  - db
+  - -p
+  - '5432'
+  - --
+  - /cabot/run.sh
+  image: docker-registry.elium.io:5000/elium/cabot:master
   volumes:
-    - /cabot
-  env_file: cabot_env
-
+  - cabot:/cabot
 db:
+  environment:
+    POSTGRES_PASSWORD: docker
+    POSTGRES_USER: docker
+  labels:
+    io.rancher.scheduler.affinity:host_label: server=true
   image: postgres
   volumes:
-    - /var/lib/cabotdb:/var/lib/postgresql
-  environment:
-    POSTGRES_USER: docker
-    POSTGRES_PASSWORD: docker
-
-celerybroker:
-  image: redis
-
+  - /var/lib/cabotdb:/var/lib/postgresql
 smtp:
   image: tianon/exim4
-
-nginx:
-  image: nginx
+celerybroker:
+  labels:
+    io.rancher.scheduler.affinity:host_label: server=true
+  image: redis
+lbcabot:
   ports:
-     - "8080:8080"
+  - 14897:8080
+  tty: true
+  image: rancher/load-balancer-service
   links:
-     - app
-  volumes_from:
-     - app
-  volumes:
-     - ./Cabot/nginx.conf:/etc/nginx/nginx.conf:ro
+  - nginx:nginx
+  stdin_open: true

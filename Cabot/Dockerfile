@@ -19,9 +19,13 @@ RUN git clone https://github.com/arachnys/cabot.git /cabot
 ADD fixture.json /cabot/
 ADD run.sh /cabot/
 ADD gunicorn.conf /cabot/gunicorn.conf
+ADD wait-for-it.sh /cabot/
+ADD nginx.conf /cabot/
+
 
 # Install dependencies
 RUN pip install -e /cabot/
+RUN pip install git+git://github.com/reddit/cabot-alert-slack.git
 RUN npm install --no-color -g coffee-script less@1.3 --registry http://registry.npmjs.org/
 RUN pip install --upgrade pip
 
@@ -41,6 +45,7 @@ ENV DB_HOST db
 ENV DB_PORT 5432
 ENV DB_USER docker
 ENV DB_PASS docker
+ENV DATABASE_URL="postgres://docker:docker@db:5432/docker"
 
 ENV DJANGO_SECRET_KEY 2FL6ORhHwr5eX34pP9mMugnIOd3jzVuT45f7w430Mt5PnEwbcJgma0q8zUXNZ68A
 
