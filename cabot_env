@@ -10,8 +10,6 @@
 # URL of calendar to synchronise rota with
 # CALENDAR_ICAL_URL=http://www.google.com/calendar/ical/example.ics
 
-<<<<<<< d42a4f82861b9f11ab65c06ee71bbaa2bd96a15a
-=======
 # Mail Settings
 # SES_HOST=__FIX_ME__
 # SES_USER=__FIX_ME__
@@ -22,7 +20,6 @@
 # only uncomment if you want simple SMTP without encryption
 #SES_BACKEND=django.core.mail.backends.smtp.EmailBackend
 
->>>>>>> Fix containers start up timing
 # Jenkins integration
 # JENKINS_API=_FIX_ME__
 # JENKINS_USER=_FIX_ME__
